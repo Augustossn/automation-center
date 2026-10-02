@@ -119,7 +119,9 @@ async function setup(page: Page, { canWrite = true, failMove = false } = {}) {
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await page.getByLabel("Senha", { exact: true }).fill("test-password");
   await page.getByRole("button", { name: "Entrar na central" }).click();
-  await expect(page.getByText("Sua operação, sob controle.")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Visão geral", level: 1, exact: true }),
+  ).toBeVisible();
   return requests;
 }
 async function dragTask(page: Page) {

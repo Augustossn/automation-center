@@ -1,0 +1,1558 @@
+openapi: 3.0.3
+info:
+  title: Automation Center API
+  version: 1.0.0
+paths:
+  /api/automation-rules:
+    get:
+      operationId: automation_rules_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qual campo usar ao ordenar os resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Um número de página dentro do conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Um termo de busca.
+        schema:
+          type: string
+      tags:
+      - automation-rules
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRuleList'
+          description: ''
+    post:
+      operationId: automation_rules_create
+      tags:
+      - automation-rules
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RuleRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RuleRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RuleRequest'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+          description: ''
+  /api/automation-rules/{id}:
+    get:
+      operationId: automation_rules_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Um string UUID que identifica este automation rule.
+        required: true
+      tags:
+      - automation-rules
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+          description: ''
+    put:
+      operationId: automation_rules_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Um string UUID que identifica este automation rule.
+        required: true
+      tags:
+      - automation-rules
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RuleRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RuleRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RuleRequest'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+          description: ''
+    patch:
+      operationId: automation_rules_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Um string UUID que identifica este automation rule.
+        required: true
+      tags:
+      - automation-rules
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRuleRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRuleRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRuleRequest'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+          description: ''
+    delete:
+      operationId: automation_rules_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Um string UUID que identifica este automation rule.
+        required: true
+      tags:
+      - automation-rules
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/channels:
+    get:
+      operationId: channels_retrieve
+      tags:
+      - channels
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/dashboard/metrics:
+    get:
+      operationId: dashboard_metrics_retrieve
+      description: Operational counts, SLA compliance, daily volume, channels and
+        active automation rules.
+      tags:
+      - dashboard
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/integration-logs:
+    get:
+      operationId: integration_logs_list
+      parameters:
+      - in: query
+        name: integration
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Qual campo usar ao ordenar os resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Um número de página dentro do conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Um termo de busca.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - FAILED
+          - PENDING
+          - RETRYING
+          - SUCCESS
+        description: |-
+          * `PENDING` - PENDING
+          * `RETRYING` - RETRYING
+          * `SUCCESS` - SUCCESS
+          * `FAILED` - FAILED
+      tags:
+      - integration-logs
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedIntegrationLogList'
+          description: ''
+  /api/integration-logs/{id}:
+    get:
+      operationId: integration_logs_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Um string UUID que identifica este integration log.
+        required: true
+      tags:
+      - integration-logs
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationLog'
+          description: ''
+  /api/integration-logs/{id}/reprocess:
+    post:
+      operationId: integration_logs_reprocess_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Um string UUID que identifica este integration log.
+        required: true
+      tags:
+      - integration-logs
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+        '409':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/leads:
+    get:
+      operationId: leads_list
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+      - in: query
+        name: channel__slug
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Qual campo usar ao ordenar os resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Um número de página dentro do conjunto de resultados paginado.
+        schema:
+          type: integer
+      - in: query
+        name: priority
+        schema:
+          type: string
+          enum:
+          - HIGH
+          - LOW
+          - MEDIUM
+          - URGENT
+        description: |-
+          * `LOW` - LOW
+          * `MEDIUM` - MEDIUM
+          * `HIGH` - HIGH
+          * `URGENT` - URGENT
+      - name: search
+        required: false
+        in: query
+        description: Um termo de busca.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - ASSIGNED
+          - CLASSIFIED
+          - FAILED
+          - IN_PROGRESS
+          - NEW
+          - RESOLVED
+          - WAITING_CUSTOMER
+        description: |-
+          * `NEW` - Novo
+          * `CLASSIFIED` - Classificado
+          * `ASSIGNED` - Atribuído
+          * `IN_PROGRESS` - Em andamento
+          * `WAITING_CUSTOMER` - Aguardando cliente
+          * `RESOLVED` - Resolvido
+          * `FAILED` - Falha
+      tags:
+      - leads
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeadList'
+          description: ''
+    post:
+      operationId: leads_create
+      tags:
+      - leads
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeadRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeadRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeadRequest'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+          description: ''
+  /api/leads/{id}:
+    get:
+      operationId: leads_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Um string UUID que identifica este lead.
+        required: true
+      tags:
+      - leads
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+          description: ''
+    patch:
+      operationId: leads_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Um string UUID que identifica este lead.
+        required: true
+      tags:
+      - leads
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLeadRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLeadRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLeadRequest'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+          description: ''
+  /api/leads/{id}/classify:
+    post:
+      operationId: leads_classify_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Um string UUID que identifica este lead.
+        required: true
+      tags:
+      - leads
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+          description: ''
+  /api/leads/{id}/reprocess:
+    post:
+      operationId: leads_reprocess_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Um string UUID que identifica este lead.
+        required: true
+      tags:
+      - leads
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/leads/{id}/timeline:
+    get:
+      operationId: leads_timeline_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Um string UUID que identifica este lead.
+        required: true
+      tags:
+      - leads
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/me:
+    get:
+      operationId: me_retrieve
+      tags:
+      - me
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/recommendations:
+    get:
+      operationId: recommendations_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qual campo usar ao ordenar os resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Um número de página dentro do conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Um termo de busca.
+        schema:
+          type: string
+      tags:
+      - recommendations
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRecommendationList'
+          description: ''
+  /api/recommendations/{id}:
+    get:
+      operationId: recommendations_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Um string UUID que identifica este agent recommendation.
+        required: true
+      tags:
+      - recommendations
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recommendation'
+          description: ''
+  /api/recommendations/{id}/decide:
+    post:
+      operationId: recommendations_decide_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Um string UUID que identifica este agent recommendation.
+        required: true
+      tags:
+      - recommendations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecisionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DecisionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DecisionRequest'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recommendation'
+          description: ''
+  /api/schema:
+    get:
+      operationId: schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - ug
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - schema
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/tasks:
+    get:
+      operationId: tasks_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qual campo usar ao ordenar os resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Um número de página dentro do conjunto de resultados paginado.
+        schema:
+          type: integer
+      - in: query
+        name: priority
+        schema:
+          type: string
+          enum:
+          - HIGH
+          - LOW
+          - MEDIUM
+          - URGENT
+        description: |-
+          * `LOW` - LOW
+          * `MEDIUM` - MEDIUM
+          * `HIGH` - HIGH
+          * `URGENT` - URGENT
+      - name: search
+        required: false
+        in: query
+        description: Um termo de busca.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - ASSIGNED
+          - CLASSIFIED
+          - FAILED
+          - IN_PROGRESS
+          - NEW
+          - RESOLVED
+          - WAITING_CUSTOMER
+        description: |-
+          * `NEW` - Novo
+          * `CLASSIFIED` - Classificado
+          * `ASSIGNED` - Atribuído
+          * `IN_PROGRESS` - Em andamento
+          * `WAITING_CUSTOMER` - Aguardando cliente
+          * `RESOLVED` - Resolvido
+          * `FAILED` - Falha
+      - in: query
+        name: team
+        schema:
+          type: string
+      tags:
+      - tasks
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTaskList'
+          description: ''
+  /api/tasks/{id}:
+    get:
+      operationId: tasks_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Um string UUID que identifica este task.
+        required: true
+      tags:
+      - tasks
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: ''
+  /api/tasks/{id}/status:
+    patch:
+      operationId: tasks_status_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Um string UUID que identifica este task.
+        required: true
+      tags:
+      - tasks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTaskStatusRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTaskStatusRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTaskStatusRequest'
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: ''
+        '409':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/webhooks/leads:
+    post:
+      operationId: webhooks_leads_create
+      description: Simulated webhook. X-Webhook-Secret and Idempotency-Key headers
+        required.
+      tags:
+      - webhooks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeadRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeadRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeadRequest'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+components:
+  schemas:
+    Customer:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 160
+        email:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        phone:
+          type: string
+          maxLength: 30
+      required:
+      - id
+      - name
+    CustomerRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 160
+        email:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        phone:
+          type: string
+          maxLength: 30
+      required:
+      - name
+    DecisionDecisionEnum:
+      enum:
+      - APPROVED
+      - REJECTED
+      type: string
+      description: |-
+        * `APPROVED` - APPROVED
+        * `REJECTED` - REJECTED
+    DecisionRequest:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionDecisionEnum'
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 2000
+      required:
+      - decision
+      - reason
+    IntegrationLog:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        lead:
+          type: string
+          format: uuid
+        integration:
+          type: string
+          maxLength: 80
+        status:
+          $ref: '#/components/schemas/IntegrationStatus'
+        attempt:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        error:
+          type: string
+        payload:
+          type: object
+          additionalProperties: {}
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - lead
+      - payload
+      - updated_at
+    IntegrationStatus:
+      enum:
+      - PENDING
+      - RETRYING
+      - SUCCESS
+      - FAILED
+      type: string
+      description: |-
+        * `PENDING` - PENDING
+        * `RETRYING` - RETRYING
+        * `SUCCESS` - SUCCESS
+        * `FAILED` - FAILED
+    Lead:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        customer:
+          $ref: '#/components/schemas/Customer'
+        channel:
+          type: string
+        content:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/WorkflowStatus'
+          readOnly: true
+        category:
+          type: string
+          readOnly: true
+        priority:
+          $ref: '#/components/schemas/PriorityEnum'
+        tags: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        idempotency_key:
+          type: string
+          nullable: true
+          maxLength: 160
+      required:
+      - category
+      - channel
+      - content
+      - created_at
+      - customer
+      - id
+      - status
+      - updated_at
+    LeadRequest:
+      type: object
+      properties:
+        customer:
+          $ref: '#/components/schemas/CustomerRequest'
+        channel:
+          type: string
+          minLength: 1
+        content:
+          type: string
+          minLength: 1
+        priority:
+          $ref: '#/components/schemas/PriorityEnum'
+        tags: {}
+        idempotency_key:
+          type: string
+          nullable: true
+          maxLength: 160
+      required:
+      - channel
+      - content
+      - customer
+    PaginatedIntegrationLogList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/IntegrationLog'
+    PaginatedLeadList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Lead'
+    PaginatedRecommendationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recommendation'
+    PaginatedRuleList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rule'
+    PaginatedTaskList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+    PatchedLeadRequest:
+      type: object
+      properties:
+        customer:
+          $ref: '#/components/schemas/CustomerRequest'
+        channel:
+          type: string
+          minLength: 1
+        content:
+          type: string
+          minLength: 1
+        priority:
+          $ref: '#/components/schemas/PriorityEnum'
+        tags: {}
+        idempotency_key:
+          type: string
+          nullable: true
+          maxLength: 160
+    PatchedRuleRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 160
+        category:
+          type: string
+          minLength: 1
+          maxLength: 80
+        keyword:
+          type: string
+          maxLength: 120
+        team:
+          type: string
+          minLength: 1
+          maxLength: 80
+        priority:
+          $ref: '#/components/schemas/PriorityEnum'
+        rank:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        active:
+          type: boolean
+        channel:
+          type: string
+          format: uuid
+          nullable: true
+    PatchedTaskStatusRequest:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/TaskStatusStatusEnum'
+        version:
+          type: integer
+          minimum: 0
+    PriorityEnum:
+      enum:
+      - LOW
+      - MEDIUM
+      - HIGH
+      - URGENT
+      type: string
+      description: |-
+        * `LOW` - LOW
+        * `MEDIUM` - MEDIUM
+        * `HIGH` - HIGH
+        * `URGENT` - URGENT
+    Recommendation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        result: {}
+        decision:
+          $ref: '#/components/schemas/RecommendationDecisionEnum'
+        decided_by:
+          type: integer
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          nullable: true
+        reason:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - result
+    RecommendationDecisionEnum:
+      enum:
+      - PENDING
+      - APPROVED
+      - REJECTED
+      type: string
+      description: |-
+        * `PENDING` - PENDING
+        * `APPROVED` - APPROVED
+        * `REJECTED` - REJECTED
+    Rule:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        name:
+          type: string
+          maxLength: 160
+        category:
+          type: string
+          maxLength: 80
+        keyword:
+          type: string
+          maxLength: 120
+        team:
+          type: string
+          maxLength: 80
+        priority:
+          $ref: '#/components/schemas/PriorityEnum'
+        rank:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        active:
+          type: boolean
+        channel:
+          type: string
+          format: uuid
+          nullable: true
+      required:
+      - category
+      - created_at
+      - id
+      - name
+      - team
+      - updated_at
+    RuleRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 160
+        category:
+          type: string
+          minLength: 1
+          maxLength: 80
+        keyword:
+          type: string
+          maxLength: 120
+        team:
+          type: string
+          minLength: 1
+          maxLength: 80
+        priority:
+          $ref: '#/components/schemas/PriorityEnum'
+        rank:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        active:
+          type: boolean
+        channel:
+          type: string
+          format: uuid
+          nullable: true
+      required:
+      - category
+      - name
+      - team
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        lead:
+          type: string
+          format: uuid
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        team:
+          type: string
+          readOnly: true
+        priority:
+          allOf:
+          - $ref: '#/components/schemas/PriorityEnum'
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/WorkflowStatus'
+          readOnly: true
+        version:
+          type: integer
+          readOnly: true
+        due_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        customer_name:
+          type: string
+          readOnly: true
+        channel:
+          type: string
+          readOnly: true
+        assignee:
+          type: string
+          nullable: true
+          readOnly: true
+      required:
+      - assignee
+      - channel
+      - created_at
+      - customer_name
+      - due_at
+      - id
+      - lead
+      - priority
+      - status
+      - team
+      - title
+      - version
+    TaskStatusStatusEnum:
+      enum:
+      - NEW
+      - CLASSIFIED
+      - ASSIGNED
+      - IN_PROGRESS
+      - WAITING_CUSTOMER
+      - RESOLVED
+      - FAILED
+      type: string
+      description: |-
+        * `NEW` - NEW
+        * `CLASSIFIED` - CLASSIFIED
+        * `ASSIGNED` - ASSIGNED
+        * `IN_PROGRESS` - IN_PROGRESS
+        * `WAITING_CUSTOMER` - WAITING_CUSTOMER
+        * `RESOLVED` - RESOLVED
+        * `FAILED` - FAILED
+    WorkflowStatus:
+      enum:
+      - NEW
+      - CLASSIFIED
+      - ASSIGNED
+      - IN_PROGRESS
+      - WAITING_CUSTOMER
+      - RESOLVED
+      - FAILED
+      type: string
+      description: |-
+        * `NEW` - Novo
+        * `CLASSIFIED` - Classificado
+        * `ASSIGNED` - Atribuído
+        * `IN_PROGRESS` - Em andamento
+        * `WAITING_CUSTOMER` - Aguardando cliente
+        * `RESOLVED` - Resolvido
+        * `FAILED` - Falha
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

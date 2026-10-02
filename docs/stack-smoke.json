@@ -1,0 +1,10 @@
+{
+  "lead_created": true,
+  "kafka_consumed": true,
+  "agent_recommendation_saved": true,
+  "task_move_persisted": true,
+  "lead_status_synchronized": true,
+  "frontend_served": true,
+  "prometheus_target_up": true,
+  "grafana_database_ok": true
+}

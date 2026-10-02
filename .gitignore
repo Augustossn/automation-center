@@ -1,0 +1,15 @@
+.env
+**/.venv/
+**/node_modules/
+**/dist/
+**/__pycache__/
+**/.pytest_cache/
+**/*.sqlite3
+**/staticfiles/
+**/test-results/
+**/playwright-report/
+**/*.pyc
+docker-*.log
+rpds-metadata.json
+frontend/local-preview.html
+**/*.tsbuildinfo

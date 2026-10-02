@@ -1,0 +1,102 @@
+x-backend: &backend
+  image: automation-center-backend:local
+  build: ./backend
+  env_file: .env
+  environment:
+    REDIS_URL: redis://redis:6379/0
+    KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  depends_on:
+    postgres: {condition: service_healthy}
+    redis: {condition: service_healthy}
+    kafka: {condition: service_healthy}
+  restart: unless-stopped
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-automation}
+      POSTGRES_USER: ${POSTGRES_USER:-automation}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-automation-local}
+    volumes: [postgres-data:/var/lib/postgresql/data]
+    healthcheck: {test: [CMD-SHELL, "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"], interval: 5s, timeout: 5s, retries: 20}
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes: [redis-data:/data]
+    healthcheck: {test: [CMD, redis-cli, ping], interval: 5s, timeout: 3s, retries: 20}
+  kafka-init:
+    image: apache/kafka:3.9.1
+    user: '0:0'
+    entrypoint: [/bin/sh, -c, 'chown -R 1000:1000 /tmp/kraft-combined-logs']
+    volumes: [kafka-data:/tmp/kraft-combined-logs]
+    restart: 'no'
+  kafka:
+    image: apache/kafka:3.9.1
+    depends_on:
+      kafka-init: {condition: service_completed_successfully}
+    ports: ["127.0.0.1:9094:9094"]
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+    volumes: [kafka-data:/tmp/kraft-combined-logs]
+    healthcheck: {test: [CMD-SHELL, "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list"], interval: 10s, timeout: 10s, retries: 20}
+  migrate:
+    <<: *backend
+    command: python manage.py migrate --noinput
+    restart: 'no'
+  backend:
+    <<: *backend
+    ports: ["127.0.0.1:${BACKEND_PORT:-8000}:8000"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck: {test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/metrics')"], interval: 10s, timeout: 5s, retries: 10}
+  consumer:
+    <<: *backend
+    command: python manage.py consume_events
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  worker:
+    <<: *backend
+    command: celery -A config worker -l INFO
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  beat:
+    <<: *backend
+    command: celery -A config beat -l INFO --schedule /tmp/celerybeat-schedule
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  frontend:
+    image: automation-center-frontend:local
+    build: ./frontend
+    ports: ["127.0.0.1:${FRONTEND_PORT:-8080}:80"]
+    depends_on:
+      backend: {condition: service_healthy}
+  prometheus:
+    image: prom/prometheus:v3.4.1
+    volumes: ["./infra/prometheus.yml:/etc/prometheus/prometheus.yml:ro", "prometheus-data:/prometheus"]
+    ports: ["127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"]
+  grafana:
+    image: grafana/grafana:12.0.1
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-change-this-grafana-password}
+    volumes: ["./infra/grafana/provisioning:/etc/grafana/provisioning:ro", "./infra/grafana/dashboards:/var/lib/grafana/dashboards:ro", "grafana-data:/var/lib/grafana"]
+    ports: ["127.0.0.1:${GRAFANA_PORT:-3000}:3000"]
+
+volumes:
+  postgres-data:
+  redis-data:
+  kafka-data:
+  prometheus-data:
+  grafana-data:

@@ -1,0 +1,13 @@
+apiVersion: batch/v1
+kind: Job
+metadata: {name: migrate-v1, namespace: automation-center}
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migrate
+          image: automation-center-backend:1.0.0
+          command: [python, manage.py, migrate, --noinput]
+          envFrom: [{configMapRef: {name: automation-config}}, {secretRef: {name: automation-secrets}}]
